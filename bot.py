@@ -30,17 +30,20 @@ def get_market_id_from_slug(slug):
         print("[DEBUG] API 回傳類型:", type(raw))
         print("[DEBUG] 回傳內容預覽:", str(raw)[:500])
 
-        if isinstance(raw, list):  # 修正點：API 回傳的是 list，不是 dict
-            for market in raw:
+        # ✅ 正確解析資料
+        if isinstance(raw, dict) and "data" in raw:
+            markets = raw["data"]
+            for market in markets:
                 if "slug" in market and market["slug"] == slug:
                     return market.get("id")
             print("[❌] 沒有找到對應 slug 的市場（比對 slug）")
         else:
-            print("[❌] API 回傳格式錯誤，預期為 list")
+            print("[❌] API 回傳格式錯誤，預期為 dict 且包含 data")
         return None
     except Exception as e:
         print(f"[❌] 查詢 market ID 時失敗: {e}")
         return None
+
 
 # ===== 擷取中間價（從 orderbook 中計算 mid price） =====
 def get_mid_price(market_id, outcome):
